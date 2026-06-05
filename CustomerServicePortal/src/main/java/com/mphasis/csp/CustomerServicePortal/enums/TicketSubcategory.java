@@ -1,0 +1,17 @@
+package com.mphasis.csp.CustomerServicePortal.enums;
+
+public enum TicketSubcategory {
+
+    BLOCKCARD,
+    UNBLOCKCARD,
+    LOSTCARD,
+    RESETPASSWORD,
+    LOGINISSUE,
+    UNLOCKACCOUNT,
+    REQUESTSTATEMENT,
+    UPDATEADDRESS,
+    UPDATEMOBILENUMBER,
+    TRANSACTIONDISPUTE,
+    SERVICECOMPLAINT,
+    GENERALFEEDBACK
+}
