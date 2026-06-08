@@ -1,12 +1,10 @@
-package com.mphasis.csp.CustomerServicePortal.service;
+package com.mphasis.csp.CustomerServicePortal.Service;
 
+import com.mphasis.csp.CustomerServicePortal.Entity.User;
+import com.mphasis.csp.CustomerServicePortal.Repository.UserRepository;
+import com.mphasis.csp.CustomerServicePortal.Security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.mphasis.csp.CustomerServicePortal.dto.RegisterRequest;
-import com.mphasis.csp.CustomerServicePortal.model.User;
-import com.mphasis.csp.CustomerServicePortal.repository.UserRepository;
 
 @Service
 public class UserService {
@@ -14,33 +12,17 @@ public class UserService {
     @Autowired
     private UserRepository repo;
 
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    @Autowired
+    private JwtUtil jwtUtil;
 
-    public User register(RegisterRequest req) {
+    public String login(String email, String password) {
 
+        User user = repo.findByEmail(email);
 
-        if (!req.getPassword().equals(req.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
+        if (user != null && user.getPassword().equals(password)) {
+            return jwtUtil.generateToken(email);
         }
 
-        if (repo.findByEmailId(req.getEmail()).isPresent()) {
-            throw new RuntimeException("Email exists");
-        }
-
-
-        User user = new User();
-
-        user.setUsername(req.getName());
-        user.setEmailId(req.getEmail());
-        user.setFirstName(req.getName());
-
-        user.setPasswordHash(encoder.encode(req.getPassword())); // ✅ encrypted password
-        user.setRole("CUSTOMER");
-
-        // ✅ ADD THESE (IMPORTANT 🔥)
-        user.setLastName(req.getLastName());
-        user.setPhoneNo(req.getPhoneNo());
-
-        return repo.save(user);
+        return null;
     }
 }

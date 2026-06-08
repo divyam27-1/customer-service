@@ -1,34 +1,53 @@
-package com.mphasis.csp.CustomerServicePortal.Controller;
 
-import com.mphasis.csp.CustomerServicePortal.Entity.User;
-import com.mphasis.csp.CustomerServicePortal.Service.UserService;
+
+package com.mphasis.csp.CustomerServicePortal.controller;
+
+import com.mphasis.csp.CustomerServicePortal.dto.RegisterRequest;
+import com.mphasis.csp.CustomerServicePortal.model.User;
+import com.mphasis.csp.CustomerServicePortal.security.JwtUtil;
+import com.mphasis.csp.CustomerServicePortal.service.UserService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
-@CrossOrigin
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://127.0.0.1:5500", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
-    private UserService service;
+    private UserService userService;
 
-    @PostMapping("/login")
-    public String login(@RequestBody User request) {
+    @Autowired
+    private JwtUtil jwtUtil;
 
-        String token = service.login(request.getEmail(), request.getPassword());
+    @PostMapping("/register")
+    public String register(@RequestBody RegisterRequest request,
+                           HttpServletResponse response) {
 
-        if (token != null) {
-            return token;
-        } else {
-            return "Invalid Credentials";
+        try {
+            // ✅ Save user
+            User user = userService.register(request);
+
+            // ✅ Generate JWT safely
+            String token = jwtUtil.generateToken(user.getEmailId());
+
+            // ✅ Store token in Cookie
+            Cookie cookie = new Cookie("jwt", token);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(86400);
+
+            response.addCookie(cookie);
+
+            return "✅ User Registered Successfully";
+
+        } catch (Exception e) {
+            e.printStackTrace();  // ✅ show exact error in console
+            return "❌ Error: " + e.getMessage();
         }
-
     }
-
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "Welcome to dashboard!";
-    }
-
 }

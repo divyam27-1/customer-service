@@ -1,9 +1,9 @@
-package com.mphasis.csp.CustomerServicePortal.repository;
+package com.mphasis.csp.CustomerServicePortal.Repository;
 
+import com.mphasis.csp.CustomerServicePortal.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.mphasis.csp.CustomerServicePortal.model.User;
-import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmailId(String emailId);
+public interface UserRepository extends JpaRepository<User, Integer> {
+
+    User findByEmail(String email);
 }
